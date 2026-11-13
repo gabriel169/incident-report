@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TALA — Philippine Incident Report</title>
+<meta name="description" content="TALA — a report on major incidents in the Philippines: what happened, how responders acted, and how to file a proper incident report.">
+<style>
+:root{
+  --bg:#0e1116; --panel:#161b22; --panel2:#1d242d; --line:#2a323d;
+  --text:#e8ecf1; --muted:#9aa6b4; --red:#ff4d4f; --amber:#ffb020; --teal:#2dd4bf; --blue:#5b9dff;
+  --radius:14px; --max:1120px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{background:var(--bg);color:var(--text);font:16px/1.65 "Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif}
+a{color:inherit;text-decoration:none}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase;font-size:.72rem;color:var(--muted)}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 20px}
+section{padding:84px 0;border-top:1px solid var(--line)}
+h1,h2,h3{line-height:1.15;letter-spacing:-.02em}
+h2{font-size:clamp(1.9rem,4vw,2.8rem);margin:10px 0 14px}
+h2 em,h1 em{font-style:normal;color:var(--red)}
+h3{font-size:1.2rem;margin-bottom:8px}
+p.lead{color:var(--muted);max-width:680px;margin-bottom:34px}
+
+/* top bar */
+header{position:sticky;top:0;z-index:50;background:rgba(14,17,22,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;height:60px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.14em}
+.logo i{width:26px;height:26px;border-radius:7px;background:var(--red);display:grid;place-items:center;font-style:normal;color:#fff;font-size:.85rem}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav a{padding:6px 12px;border-radius:999px;font-size:.88rem;color:var(--muted)}
+nav a:hover,nav a.on{background:var(--panel2);color:var(--text)}
+
+/* hero */
+.hero{padding:110px 0 90px;border:0;background:
+  radial-gradient(900px 400px at 85% -10%,rgba(255,77,79,.22),transparent 60%),
+  radial-gradient(700px 380px at 0% 110%,rgba(91,157,255,.14),transparent 60%)}
+.hero h1{font-size:clamp(2.6rem,7vw,5rem);margin:18px 0 20px}
+.hero p{font-size:1.15rem;color:var(--muted);max-width:620px}
+.btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.btn{display:inline-block;padding:12px 22px;border-radius:999px;font-weight:600;border:1px solid var(--line);background:var(--panel);cursor:pointer;color:var(--text);font-size:.95rem;font-family:inherit}
+.btn.primary{background:var(--red);border-color:var(--red);color:#fff}
+.btn:hover{filter:brightness(1.15)}
+.status{display:inline-flex;align-items:center;gap:8px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--red);animation:pulse 1.6s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,77,79,.6)}100%{box-shadow:0 0 0 12px rgba(255,77,79,0)}}
+
+/* cards */
+.grid{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:24px;transition:.2s}
+.card:hover{border-color:#3b4655;transform:translateY(-2px)}
+.card p{color:var(--muted);font-size:.95rem}
+.stat b{display:block;font-size:2.6rem;color:var(--amber);letter-spacing:-.03em;line-height:1.1}
+.tag{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:1px solid}
+.t-nat{color:var(--teal);border-color:var(--teal)}
+.t-fire{color:var(--red);border-color:var(--red)}
+.t-sea{color:var(--blue);border-color:var(--blue)}
+.t-safe{color:var(--amber);border-color:var(--amber)}
+.note{font-size:.85rem;color:var(--muted);margin-top:18px}
+
+/* filters */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+.chip{padding:7px 16px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;font:inherit;font-size:.88rem}
+.chip.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+
+/* timeline */
+.timeline{position:relative;border-left:2px solid var(--line);margin-left:8px}
+.case{position:relative;margin:0 0 20px 28px}
+.case::before{content:"";position:absolute;left:-37px;top:28px;width:14px;height:14px;border-radius:50%;background:var(--bg);border:3px solid var(--red)}
+.case .top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.case dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
+.case dt{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.case dd{font-weight:600}
+.hide{display:none}
+
+/* form */
+form{display:grid;gap:14px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.08em}
+input,select,textarea{width:100%;padding:11px 13px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);font:inherit}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--blue);outline-offset:0}
+textarea{min-height:96px;resize:vertical}
+.preview{white-space:pre-wrap;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.86rem;background:var(--bg);border:1px dashed var(--line);border-radius:12px;padding:18px;min-height:240px;color:#cfd7e1}
+.saved li{list-style:none;display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:.92rem}
+.saved button{background:none;border:0;color:var(--red);cursor:pointer;font:inherit}
+
+/* table */
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.1em}
+.tablewrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius)}
+
+/* steps */
+.step{counter-increment:s}
+.step h3::before{content:counter(s,decimal-leading-zero);display:block;font-family:ui-monospace,monospace;color:var(--red);font-size:.85rem;margin-bottom:6px}
+.steps{counter-reset:s}
+
+footer{padding:50px 0;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem}
+.todo{background:rgba(255,176,32,.12);border:1px solid var(--amber);color:var(--amber);padding:2px 8px;border-radius:6px;font-size:.85em}
+
+@media print{
+  header,.hero,section:not(#report),footer,.noprint{display:none!important}
+  body{background:#fff;color:#000}
+  .preview{border:0;color:#000;background:#fff}
+}
+</style>
+</head>
+<body id="top">
+
+<header>
+  <div class="wrap bar">
+    <a href="#top" class="logo"><i>T</i>TALA</a>
+    <nav id="nav">
+      <a href="#overview">01 Overview</a>
+      <a href="#types">02 Types</a>
+      <a href="#cases">03 Case files</a>
+      <a href="#report">04 File a report</a>
+      <a href="#response">05 Response</a>
+      <a href="#prevention">06 Prevention</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <span class="mono status"><span class="dot"></span> Incident report / Philippines</span>
+    <h1>Every incident leaves a <em>record.</em></h1>
+    <p>TALA (Filipino for "record") documents major incidents in the Philippines — disasters, fires, sea accidents and public safety events — and shows how to write a clear, usable incident report.</p>
+    <div class="btns">
+      <a class="btn primary" href="#cases">Read the case files ↓</a>
+      <a class="btn" href="#report">File an incident report ↗</a>
+    </div>
+  </div>
+</section>
+
+<!-- OVERVIEW -->
+<section id="overview">
+  <div class="wrap">
+    <span class="mono">01 — Overview</span>
+    <h2>Why the Philippines needs <em>good records.</em></h2>
+    <p class="lead">The country sits on the Pacific Ring of Fire and along a busy typhoon belt, and it is made up of more than 7,000 islands. That mix of hazards and geography makes accurate, fast incident reporting a daily necessity.</p>
+    <div class="grid g4">
+      <div class="card stat"><b>~20</b><p>tropical cyclones typically enter the Philippine Area of Responsibility each year (PAGASA).</p></div>
+      <div class="card stat"><b>7,000+</b><p>islands, which complicates response, transport and communication after an incident.</p></div>
+      <div class="card stat"><b>911</b><p>the national emergency hotline for police, fire and medical help.</p></div>
+      <div class="card stat"><b>5 W's</b><p>Who, What, When, Where, Why — the core of every incident report.</p></div>
+    </div>
+    <p class="note">Figures are general reference values. For official and current numbers, check PAGASA, PHIVOLCS, NDRRMC and the Philippine Statistics Authority.</p>
+  </div>
+</section>
+
+<!-- TYPES -->
+<section id="types">
+  <div class="wrap">
+    <span class="mono">02 — Incident types</span>
+    <h2>Four main kinds of <em>incidents.</em></h2>
+    <p class="lead">Classifying an incident correctly decides who responds and which agency receives the report.</p>
+    <div class="grid g2">
+      <div class="card"><span class="tag t-nat">Natural hazard</span><h3 style="margin-top:12px">Typhoons, floods, earthquakes, eruptions</h3><p>Tracked by PAGASA (weather) and PHIVOLCS (earthquakes and volcanoes). Coordinated nationally by the NDRRMC and locally by LGU DRRM offices.</p></div>
+      <div class="card"><span class="tag t-fire">Fire</span><h3 style="margin-top:12px">Structural and industrial fires</h3><p>Handled by the Bureau of Fire Protection (BFP). Causes often include faulty wiring, blocked exits and missing safety equipment.</p></div>
+      <div class="card"><span class="tag t-sea">Transport &amp; maritime</span><h3 style="margin-top:12px">Road crashes and sea accidents</h3><p>Land incidents go to the PNP and LTO; sea incidents to the Philippine Coast Guard and MARINA.</p></div>
+      <div class="card"><span class="tag t-safe">Public safety</span><h3 style="margin-top:12px">Crime, violence and security events</h3><p>Handled by the Philippine National Police with barangay and local government support.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CASE FILES -->
+<section id="cases">
+  <div class="wrap">
+    <span class="mono">03 — Case files</span>
+    <h2>Notable incidents, <em>on record.</em></h2>
+    <p class="lead">A selection of widely documented incidents and what each one taught responders and policymakers.</p>
+
+    <div class="filters" id="filters">
+      <button class="chip on" data-f="all">All</button>
+      <button class="chip" data-f="nat">Natural hazard</button>
+      <button class="chip" data-f="fire">Fire</button>
+      <button class="chip" data-f="sea">Maritime</button>
+    </div>
+
+    <div class="timeline" id="cases-list">
+      <article class="card case" data-t="sea">
+        <div class="top"><span class="tag t-sea">Maritime</span><span class="mono">C—01 / Dec 20, 1987</span></div>
+        <h3>Sinking of MV Doña Paz</h3>
+        <p>The passenger ferry collided with a tanker in the Tablas Strait. It is widely described as the deadliest peacetime maritime disaster, with estimates of more than 4,000 deaths.</p>
+        <dl><div><dt>Location</dt><dd>Tablas Strait</dd></div><div><dt>Agency</dt><dd>Coast Guard / MARINA</dd></div><div><dt>Lesson</dt><dd>Passenger manifests &amp; overloading</dd></div></dl>
+      </article>
+
+      <article class="card case" data-t="fire">
+        <div class="top"><span class="tag t-fire">Fire</span><span class="mono">C—02 / Mar 18, 1996</span></div>
+        <h3>Ozone Disco fire</h3>
+        <p>A fire at a Quezon City disco killed 162 people. Locked and obstructed exits and overcrowding were central findings.</p>
+        <dl><div><dt>Location</dt><dd>Quezon City</dd></div><div><dt>Agency</dt><dd>BFP</dd></div><div><dt>Lesson</dt><dd>Exit access &amp; occupancy limits</dd></div></dl>
+      </article>
+
+      <article class="card case" data-t="nat">
+        <div class="top"><span class="tag t-nat">Natural hazard</span><span class="mono">C—03 / Oct 15, 2013</span></div>
+        <h3>Bohol earthquake</h3>
+        <p>A magnitude 7.2 earthquake struck Bohol, killing over 200 people and damaging churches, bridges and homes across the province.</p>
+        <dl><div><dt>Location</dt><dd>Bohol</dd></div><div><dt>Agency</dt><dd>PHIVOLCS / NDRRMC</dd></div><div><dt>Lesson</dt><dd>Heritage and infrastructure resilience</dd></div></dl>
+      </article>
+
+      <article class="card case" data-t="nat">
+        <div class="top"><span class="tag t-nat">Natural hazard</span><span class="mono">C—04 / Nov 8, 2013</span></div>
+        <h3>Typhoon Haiyan (Yolanda)</h3>
+        <p>One of the strongest typhoons ever recorded at landfall devastated Eastern Visayas, especially Tacloban. More than 6,000 deaths were reported, and the storm surge was a major cause.</p>
+        <dl><div><dt>Location</dt><dd>Eastern Visayas</dd></div><div><dt>Agency</dt><dd>NDRRMC / PAGASA</dd></div><div><dt>Lesson</dt><dd>Storm surge warnings &amp; preemptive evacuation</dd></div></dl>
+      </article>
+
+      <article class="card case" data-t="fire">
+        <div class="top"><span class="tag t-fire">Fire</span><span class="mono">C—05 / May 13, 2015</span></div>
+        <h3>Kentex factory fire</h3>
+        <p>A fire at a slipper factory in Valenzuela City killed more than 70 workers. Investigations pointed to poor fire safety and blocked escape routes.</p>
+        <dl><div><dt>Location</dt><dd>Valenzuela City</dd></div><div><dt>Agency</dt><dd>BFP / DOLE</dd></div><div><dt>Lesson</dt><dd>Workplace safety inspections</dd></div></dl>
+      </article>
+
+      <article class="card case" data-t="nat">
+        <div class="top"><span class="tag t-nat">Natural hazard</span><span class="mono">C—06 / Jan 12, 2020</span></div>
+        <h3>Taal Volcano eruption</h3>
+        <p>A phreatomagmatic eruption sent ash across Calabarzon and Metro Manila and forced hundreds of thousands of residents to evacuate.</p>
+        <dl><div><dt>Location</dt><dd>Batangas / Cavite</dd></div><div><dt>Agency</dt><dd>PHIVOLCS</dd></div><div><dt>Lesson</dt><dd>Alert levels &amp; evacuation centers</dd></div></dl>
+      </article>
+
+      <article class="card case" data-t="nat">
+        <div class="top"><span class="tag t-nat">Natural hazard</span><span class="mono">C—07 / Dec 16, 2021</span></div>
+        <h3>Typhoon Odette (Rai)</h3>
+        <p>A Category 5-equivalent typhoon hit Siargao, Bohol, Cebu and other areas in the Visayas and Mindanao, with more than 400 deaths and widespread power, water and communication loss.</p>
+        <dl><div><dt>Location</dt><dd>Visayas &amp; Mindanao</dd></div><div><dt>Agency</dt><dd>NDRRMC / PAGASA</dd></div><div><dt>Lesson</dt><dd>Restoring communications fast</dd></div></dl>
+      </article>
+    </div>
+    <p class="note">Death tolls are approximate and vary by source. Verify any figure you cite against NDRRMC reports or other official records.</p>
+  </div>
+</section>
+
+<!-- REPORT BUILDER -->
+<section id="report">
+  <div class="wrap">
+    <span class="mono">04 — File a report</span>
+    <h2>Build an incident <em>report.</em></h2>
+    <p class="lead">Fill in the form and a formatted report appears beside it. Copy it, print it, or save it in this browser. Nothing is sent anywhere.</p>
+    <div class="grid g2">
+      <div class="card noprint">
+        <form id="f">
+          <div><label for="title">Incident title</label><input id="title" placeholder="e.g. Kitchen fire at barangay hall"></div>
+          <div class="row">
+            <div><label for="date">Date</label><input id="date" type="date"></div>
+            <div><label for="time">Time</label><input id="time" type="time"></div>
+          </div>
+          <div class="row">
+            <div><label for="type">Type</label>
+              <select id="type"><option>Natural hazard</option><option>Fire</option><option>Transport / maritime</option><option>Public safety</option><option>Other</option></select></div>
+            <div><label for="sev">Severity</label>
+              <select id="sev"><option>Minor</option><option>Moderate</option><option>Serious</option><option>Critical</option></select></div>
+          </div>
+          <div><label for="loc">Location (barangay, city, province)</label><input id="loc" placeholder="Brgy. ___, ___ City, ___"></div>
+          <div><label for="desc">What happened</label><textarea id="desc" placeholder="Describe the incident in order. Facts only."></textarea></div>
+          <div class="row">
+            <div><label for="inj">Injuries / casualties</label><input id="inj" placeholder="None / number"></div>
+            <div><label for="agency">Agencies notified</label><input id="agency" placeholder="BFP, PNP, LGU..."></div>
+          </div>
+          <div><label for="action">Action taken</label><textarea id="action" placeholder="What was done in response?"></textarea></div>
+          <div><label for="by">Reported by</label><input id="by" placeholder="Name / position"></div>
+        </form>
+      </div>
+      <div class="card">
+        <div class="mono" style="margin-bottom:10px">Report preview</div>
+        <div class="preview" id="out"></div>
+        <div class="btns noprint">
+          <button class="btn primary" id="save" type="button">Save</button>
+          <button class="btn" id="copy" type="button">Copy</button>
+          <button class="btn" id="print" type="button">Print / PDF</button>
+          <button class="btn" id="clear" type="button">Clear form</button>
+        </div>
+        <ul class="saved noprint" id="saved" style="margin-top:20px"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESPONSE -->
+<section id="response">
+  <div class="wrap">
+    <span class="mono">05 — Response</span>
+    <h2>Who to <em>call.</em></h2>
+    <p class="lead">In an emergency, call first and write the report afterwards.</p>
+    <div class="tablewrap">
+      <table>
+        <tr><th>Agency</th><th>Role</th><th>Contact</th></tr>
+        <tr><td>National Emergency Hotline</td><td>Police, fire and medical emergencies</td><td>911</td></tr>
+        <tr><td>Philippine Red Cross</td><td>Emergency medical help, disaster relief</td><td>143</td></tr>
+        <tr><td>BFP</td><td>Fire response and fire safety</td><td>via 911 or your local fire station</td></tr>
+        <tr><td>PNP</td><td>Police response and crime reports</td><td>via 911 or your local station</td></tr>
+        <tr><td>NDRRMC</td><td>National disaster risk reduction and management</td><td>ndrrmc.gov.ph</td></tr>
+        <tr><td>PAGASA / PHIVOLCS</td><td>Weather, earthquakes and volcano updates</td><td>pagasa.dost.gov.ph / phivolcs.dost.gov.ph</td></tr>
+      </table>
+    </div>
+    <p class="note">Local hotlines differ by city and province. Add your own LGU numbers here: <span class="todo">edit me</span></p>
+  </div>
+</section>
+
+<!-- PREVENTION -->
+<section id="prevention">
+  <div class="wrap">
+    <span class="mono">06 — Prevention</span>
+    <h2>What the records <em>teach.</em></h2>
+    <p class="lead">Across the case files, the same themes repeat. Reports are only useful if they change what we do next.</p>
+    <div class="grid g4 steps">
+      <div class="card step"><h3>Know the hazards</h3><p>Check hazard maps and warnings from PAGASA and PHIVOLCS before an event, not during it.</p></div>
+      <div class="card step"><h3>Keep exits clear</h3><p>Locked or blocked exits turned fires into mass-casualty events. Inspect and fix them.</p></div>
+      <div class="card step"><h3>Evacuate early</h3><p>Preemptive evacuation saves lives, especially ahead of storm surge and eruptions.</p></div>
+      <div class="card step"><h3>Document honestly</h3><p>Record facts, times and actions while they are fresh. Good records drive better policy.</p></div>
+    </div>
+    <div class="card" style="margin-top:20px">
+      <span class="mono">Conclusion</span>
+      <h3 style="margin-top:8px">A record is how a lesson survives.</h3>
+      <p>Each incident above ended, but its record is what led to stronger warnings, safer buildings and better coordination. Reporting clearly and truthfully is a practical way to protect the next community.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div><b style="color:var(--text)">TALA / Incident Report</b><br>Philippines. Prepared by: <span class="todo">your name / group</span></div>
+    <div>© 2026 · <a href="#top" style="text-decoration:underline">Back to top ↑</a></div>
+  </div>
+</footer>
+
+<script>
+// ---- nav highlight ----
+const links=[...document.querySelectorAll('#nav a')];
+const secs=links.map(a=>document.querySelector(a.getAttribute('href')));
+addEventListener('scroll',()=>{
+  const y=scrollY+120;let cur=-1;
+  secs.forEach((s,i)=>{if(s&&s.offsetTop<=y)cur=i});
+  links.forEach((a,i)=>a.classList.toggle('on',i===cur));
+});
+
+// ---- case filter ----
+document.querySelectorAll('#filters .chip').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#filters .chip').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  const f=b.dataset.f;
+  document.querySelectorAll('#cases-list .case').forEach(c=>c.classList.toggle('hide',f!=='all'&&c.dataset.t!==f));
+});
+
+// ---- report builder ----
+const ids=['title','date','time','type','sev','loc','desc','inj','agency','action','by'];
+const $=id=>document.getElementById(id);
+const out=$('out');
+function build(){
+  const v=k=>$(k).value.trim()||'—';
+  return `INCIDENT REPORT\n${'='.repeat(40)}\nTitle:      ${v('title')}\nDate/Time:  ${v('date')} ${$('time').value}\nType:       ${$('type').value}\nSeverity:   ${$('sev').value}\nLocation:   ${v('loc')}\n\nDESCRIPTION\n${v('desc')}\n\nINJURIES / CASUALTIES\n${v('inj')}\n\nAGENCIES NOTIFIED\n${v('agency')}\n\nACTION TAKEN\n${v('action')}\n\nReported by: ${v('by')}\nPrepared:    ${new Date().toLocaleString('en-PH')}`;
+}
+function render(){out.textContent=build()}
+ids.forEach(i=>$(i).addEventListener('input',render));
+render();
+
+const KEY='tala-reports';
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||[]}catch(e){return[]}}
+function store(a){try{localStorage.setItem(KEY,JSON.stringify(a))}catch(e){}}
+function list(){
+  const ul=$('saved');ul.innerHTML='';
+  load().forEach((r,i)=>{
+    const li=document.createElement('li');
+    const s=document.createElement('span');s.textContent=(r.title||'Untitled')+' · '+(r.date||'no date');
+    s.style.cursor='pointer';s.onclick=()=>{ids.forEach(k=>$(k).value=r[k]||'');render()};
+    const d=document.createElement('button');d.textContent='Delete';
+    d.onclick=()=>{const a=load();a.splice(i,1);store(a);list()};
+    li.append(s,d);ul.append(li);
+  });
+}
+list();
+$('save').onclick=()=>{const r={};ids.forEach(k=>r[k]=$(k).value);const a=load();a.unshift(r);store(a);list()};
+$('copy').onclick=async()=>{try{await navigator.clipboard.writeText(build());$('copy').textContent='Copied ✓';setTimeout(()=>$('copy').textContent='Copy',1500)}catch(e){}};
+$('print').onclick=()=>print();
+$('clear').onclick=()=>{ids.forEach(k=>{const e=$(k);if(e.tagName!=='SELECT')e.value=''});render()};
+</script>
+</body>
+</html>
